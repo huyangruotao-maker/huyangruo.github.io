@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSI Data from Data.gov.sg</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Real-time PSI Data</h1>
+    <p>Current air quality data from the Singapore government.</p>
+
+    <table id="psi-table">
+        <thead>
+            <tr>
+                <th>Reading</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data rows will be inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Function to fetch data from the API and populate the table
+    function fetchPSIData() {
+        fetch('https://api.data.gov.sg/v1/environment/psi')
+            .then(response => response.json())
+            .then(data => {
+                const readings = data.items[0].readings;
+                const tableBody = document.querySelector('#psi-table tbody');
+                
+                // Clear any existing rows in the table
+                tableBody.innerHTML = '';
+
+                // Create a table row for each PSI reading
+                for (let key in readings) {
+                    if (readings.hasOwnProperty(key)) {
+                        const row = document.createElement('tr');
+                        const cell1 = document.createElement('td');
+                        const cell2 = document.createElement('td');
+
+                        cell1.textContent = key.replace(/_/g, ' ').toUpperCase();
+                        cell2.textContent = readings[key];
+
+                        row.appendChild(cell1);
+                        row.appendChild(cell2);
+                        tableBody.appendChild(row);
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching PSI data:', error));
+    }
+
+    // Fetch data when the page is loaded
+    window.onload = fetchPSIData;
+</script>
+
+</body>
+</html>
