@@ -1,100 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PSI Data from Data.gov.sg</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Singapore PSI Realtime Table</title>
+  <style>
+    /* 基本页面样式 */
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #f0f4f8, #e0f7fa);
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #007bff;
+      padding: 20px;
+      margin: 0;
+      font-size: 32px;
+      text-shadow: 2px 2px 4px rgba(0, 123, 255, 0.3);
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 30px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .footer a {
+      text-decoration: none;
+      color: #007bff;
+    }
+
+    /* 表格样式 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f1f8ff;
+    }
+
+    tr:hover {
+      background-color: #e2f1ff;
+      cursor: pointer;
+    }
+
+    td {
+      font-size: 16px;
+    }
+
+    /* 刷新按钮 */
+    .refresh-btn {
+      display: block;
+      margin: 20px auto;
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .refresh-btn:hover {
+      background-color: #218838;
+    }
+
+    .refresh-btn:focus {
+      outline: none;
+    }
+
+  </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Real-time PSI Data</h1>
-    <p>Current air quality data from the Singapore government.</p>
+  <h1>Singapore PSI Realtime Readings</h1>
+  <button class="refresh-btn" onclick="fetchPSIData()">刷新数据</button>
+  
+  <table id="psiTable">
+    <thead>
+      <tr>
+        <th>Reading</th>
+        <!-- Regions will be added dynamically -->
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr><td colspan="6">Loading data...</td></tr>
+    </tbody>
+  </table>
 
-    <table id="psi-table">
-        <thead>
-            <tr>
-                <th>Reading</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data rows will be inserted here -->
-        </tbody>
-    </table>
+  <div class="footer">
+    Data from <a href="https://data.gov.sg/dataset/environment-air-quality" target="_blank">data.gov.sg API</a>
+  </div>
 </div>
 
 <script>
-    // Function to fetch data from the API and populate the table
-    function fetchPSIData() {
-        fetch('https://api.data.gov.sg/v1/environment/psi')
-            .then(response => response.json())
-            .then(data => {
-                console.log(data); // Check the structure of the response
-                const readings = data.items[0].readings; // Assuming the data structure is correct
-                const tableBody = document.querySelector('#psi-table tbody');
-                
-                // Clear any existing rows in the table
-                tableBody.innerHTML = '';
+  async function fetchPSIData() {
+    const tableBody = document.getElementById('tableBody');
+    const tableHeader = document.querySelector('thead tr');
 
-                // Create a table row for each PSI reading
-                for (let key in readings) {
-                    if (readings.hasOwnProperty(key)) {
-                        const row = document.createElement('tr');
-                        const cell1 = document.createElement('td');
-                        const cell2 = document.createElement('td');
+    tableBody.innerHTML = '<tr><td colspan="6">Loading data...</td></tr>';
+    
+    try {
+      const response = await fetch('https://api.data.gov.sg/v1/environment/psi');
+      const data = await response.json();
 
-                        cell1.textContent = key.replace(/_/g, ' ').toUpperCase();
-                        cell2.textContent = readings[key];
+      const readings = data.items[0].readings;
+      const regions = data.region_metadata.map(r => r.name);
+      const metrics = Object.keys(readings);
 
-                        row.appendChild(cell1);
-                        row.appendChild(cell2);
-                        tableBody.appendChild(row);
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching PSI data:', error);
-                alert('There was an error fetching the data.');
-            });
+      // 清空表头并动态添加区域列
+      tableHeader.innerHTML = '<th>Reading</th>';
+      regions.forEach(region => {
+        const th = document.createElement('th');
+        th.textContent = region;
+        tableHeader.appendChild(th);
+      });
+
+      // 清空表格内容并填充数据
+      tableBody.innerHTML = '';
+      
+      metrics.forEach(metric => {
+        const tr = document.createElement('tr');
+        let rowHtml = `<td>${metric}</td>`;
+        regions.forEach(region => {
+          rowHtml += `<td>${readings[metric][region]}</td>`;
+        });
+        tr.innerHTML = rowHtml;
+        tableBody.appendChild(tr);
+      });
+    } catch (error) {
+      tableBody.innerHTML = `<tr><td colspan="6">Error fetching data: ${error}</td></tr>`;
     }
+  }
 
-    // Fetch data when the page is loaded
-    window.onload = fetchPSIData;
+  // 页面加载时获取数据，并每5分钟刷新一次
+  fetchPSIData();
+  setInterval(fetchPSIData, 5 * 60 * 1000); // 每5分钟刷新一次
 </script>
 
 </body>
