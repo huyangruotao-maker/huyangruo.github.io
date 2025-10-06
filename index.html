@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Singapore PSI Realtime Table</title>
   <style>
-    /* 基本页面样式 */
+    /* Basic Page Styles */
     body {
       font-family: 'Arial', sans-serif;
       background: linear-gradient(135deg, #f0f4f8, #e0f7fa);
@@ -45,7 +45,7 @@
       color: #007bff;
     }
 
-    /* 表格样式 */
+    /* Table Styles */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -77,7 +77,7 @@
       font-size: 16px;
     }
 
-    /* 刷新按钮 */
+    /* Refresh Button */
     .refresh-btn {
       display: block;
       margin: 20px auto;
@@ -105,7 +105,7 @@
 
 <div class="container">
   <h1>Singapore PSI Realtime Readings</h1>
-  <button class="refresh-btn" onclick="fetchPSIData()">刷新数据</button>
+  <button class="refresh-btn" onclick="fetchPSIData()">Refresh Data</button>
   
   <table id="psiTable">
     <thead>
@@ -139,7 +139,7 @@
       const regions = data.region_metadata.map(r => r.name);
       const metrics = Object.keys(readings);
 
-      // 清空表头并动态添加区域列
+      // Clear previous headers and dynamically add region columns
       tableHeader.innerHTML = '<th>Reading</th>';
       regions.forEach(region => {
         const th = document.createElement('th');
@@ -147,7 +147,7 @@
         tableHeader.appendChild(th);
       });
 
-      // 清空表格内容并填充数据
+      // Clear table body and populate with new data
       tableBody.innerHTML = '';
       
       metrics.forEach(metric => {
@@ -164,9 +164,9 @@
     }
   }
 
-  // 页面加载时获取数据，并每5分钟刷新一次
+  // Fetch PSI data on page load and refresh every 5 minutes
   fetchPSIData();
-  setInterval(fetchPSIData, 5 * 60 * 1000); // 每5分钟刷新一次
+  setInterval(fetchPSIData, 5 * 60 * 1000); // refresh every 5 minutes
 </script>
 
 </body>
