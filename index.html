@@ -64,7 +64,8 @@
         fetch('https://api.data.gov.sg/v1/environment/psi')
             .then(response => response.json())
             .then(data => {
-                const readings = data.items[0].readings;
+                console.log(data); // Check the structure of the response
+                const readings = data.items[0].readings; // Assuming the data structure is correct
                 const tableBody = document.querySelector('#psi-table tbody');
                 
                 // Clear any existing rows in the table
@@ -86,7 +87,10 @@
                     }
                 }
             })
-            .catch(error => console.error('Error fetching PSI data:', error));
+            .catch(error => {
+                console.error('Error fetching PSI data:', error);
+                alert('There was an error fetching the data.');
+            });
     }
 
     // Fetch data when the page is loaded
